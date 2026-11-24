@@ -1,0 +1,7 @@
+PRAGMA foreign_keys = ON;
+CREATE TABLE IF NOT EXISTS users(id TEXT PRIMARY KEY,email TEXT NOT NULL UNIQUE,identity_provider TEXT,status TEXT NOT NULL DEFAULT 'pending',created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE IF NOT EXISTS plans(id TEXT PRIMARY KEY,name TEXT NOT NULL,device_limit INTEGER NOT NULL,price_cents INTEGER NOT NULL DEFAULT 0,currency TEXT NOT NULL DEFAULT 'EUR',active INTEGER NOT NULL DEFAULT 1);
+CREATE TABLE IF NOT EXISTS devices(id TEXT PRIMARY KEY,user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,label TEXT NOT NULL,platform TEXT NOT NULL,public_key TEXT,status TEXT NOT NULL DEFAULT 'pending',created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,revoked_at TEXT);
+CREATE TABLE IF NOT EXISTS vpn_nodes(id TEXT PRIMARY KEY,name TEXT NOT NULL,country_code TEXT NOT NULL,region TEXT NOT NULL,endpoint TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'offline',last_health_check TEXT);
+CREATE TABLE IF NOT EXISTS sessions(id TEXT PRIMARY KEY,user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,device_id TEXT NOT NULL REFERENCES devices(id) ON DELETE CASCADE,node_id TEXT NOT NULL REFERENCES vpn_nodes(id),status TEXT NOT NULL DEFAULT 'provisioning',started_at TEXT,ended_at TEXT);
+INSERT OR IGNORE INTO plans(id,name,device_limit,price_cents,currency) VALUES('starter','Starter',1,0,'EUR'),('plus','Plus',5,499,'EUR');
